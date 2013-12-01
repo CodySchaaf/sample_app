@@ -6,6 +6,20 @@ def valid_signin(user)
 	click_button "Sign in"
 end
 
+def check_link_and_title(link, title)
+	click_link link
+  expect(page).to have_title(full_title('About Us'))
+end
+
+RSpec::Matchers.define :check_link_and_title do |link, *title|
+	click_link link
+	if title
+		match do |page|
+  		expect(page).to have_title(full_title(title))
+  	end
+  end
+end
+
 RSpec::Matchers.define :have_error_message do |message|
   match do |page|
     expect(page).to have_selector('div.alert.alert-error', text: message)
