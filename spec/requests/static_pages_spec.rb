@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe "Static pages" do
+  include LinksAndTitlesHelpers
 
   subject { page }
 
@@ -44,27 +45,8 @@ describe "Static pages" do
 
   it "should have the right links on the layout" do
     visit root_path
-    check_link_and_title "About", 'About Us' 
-    check_link_and_title "Help", 'Help'
-    check_link_and_title "Contact", 'Contact'
-    check_link_and_title "Home"
-    check_link_and_title "Sign up now!", 'Sign up'
-    check_link_and_title "sample app", ''
+    links_and_titles_hash.each do |link, title|
+      check_link_and_title link, title
+    end
   end
-
-
-  # it "should have the right links on the layout" do
-  #   visit root_path
-  #   click_link "About"
-  #   expect(page).to have_title(full_title('About Us'))
-  #   click_link "Help"
-  #   expect(page).to have_title(full_title('Help'))
-  #   click_link "Contact"
-  #   expect(page).to have_title(full_title('Contact'))
-  #   click_link "Home"
-  #   click_link "Sign up now!"
-  #   expect(page).to have_title(full_title('Sign up'))
-  #   click_link "sample app"
-  #   expect(page).to have_title(full_title(''))
-  # end
 end
