@@ -1,7 +1,8 @@
 class UsersController < ApplicationController
-  before_action :signed_in_user,  only: [:edit, :update, :index, :destroy]
-  before_action :correct_user,    only: [:edit, :update]
-  before_action :admin_user,      only: :destroy
+  before_action :signed_in_user,    only: [:edit, :update, :index, :destroy]
+  before_action :correct_user,      only: [:edit, :update]
+  before_action :admin_user,        only: :destroy
+  before_action :currently_signed_in?, only: [:new, :create]
 
   def index
     @users = User.paginate(page: params[:page])
@@ -48,10 +49,16 @@ class UsersController < ApplicationController
 
   def user_params
     params.require(:user).permit(:name, :email, :password,
-                                 :password_confirmation, :admin)
+                                 :password_confirmation)
   end
 
   # Before filters
+
+  def currently_signed_in?
+    if signed_in?
+      redirect_to root_url
+    end
+  end
 
   def signed_in_user
     unless signed_in?

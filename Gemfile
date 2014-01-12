@@ -26,14 +26,14 @@ group :development, :test do
   gem 'childprocess', '0.3.6'
 end
 
-group :development do
-  gem 'terminal-notifier'
-  gem 'irbtools-more', require: false
-  gem 'irbtools-more', require: 'binding.repl'
-  gem 'better_errors'
-  gem 'binding_of_caller'
-  gem 'meta_request'
-end
+# group :development do
+#   gem 'terminal-notifier'
+#   gem 'irbtools-more', require: false
+#   gem 'irbtools-more', require: 'binding.repl'
+#   gem 'better_errors'
+#   gem 'binding_of_caller'
+#   gem 'meta_request'
+# end
 
 group :test do
 	gem 'cucumber-rails', '1.4.0', require: false

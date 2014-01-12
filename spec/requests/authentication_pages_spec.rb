@@ -5,8 +5,14 @@ describe "Authentication" do
   subject { page }
 
   describe "signin page" do
+    let(:user) { FactoryGirl.create(:user) }
     before { visit signin_path }
 
+    it { should_not have_title(user.name) }
+    it { should_not have_link('Users',       href: users_path) }
+    it { should_not have_link('Profile',     href: user_path(user)) }
+    it { should_not have_link('Settings',    href: edit_user_path(user)) }
+    it { should_not have_link('Sign out',    href: signout_path) }
     it { should have_content('Sign in') }
     it { should have_title('Sign in') }
   end
@@ -28,19 +34,44 @@ describe "Authentication" do
 
     describe "with valid information" do
       let(:user) { FactoryGirl.create(:user) }
-      before { valid_signin(user) }
-
-      it { should have_title(user.name) }
-      it { should have_link('Users',       href: users_path) }
-      it { should have_link('Profile',     href: user_path(user)) }
-      it { should have_link('Settings',    href: edit_user_path(user)) }
-      it { should have_link('Sign out',    href: signout_path) }
-      it { should_not have_link('Sign in', href: signin_path) }
-
-      describe "followed by signout" do
-        before { click_link "Sign out" }
-        it { should have_link('Sign in') }
+      let(:new_user) do 
+        {user: { name: "", email: "", password: "",
+                            password_confirmation: "" }}
       end
+      describe "after signing in" do 
+        before { sign_in user }
+         
+        it { should have_title(user.name) }
+        it { should have_link('Users',       href: users_path) }
+        it { should have_link('Profile',     href: user_path(user)) }
+        it { should have_link('Settings',    href: edit_user_path(user)) }
+        it { should have_link('Sign out',    href: signout_path) }
+        it { should_not have_link('Sign in', href: signin_path) }
+
+        describe "in the Users controller" do
+
+          describe "visiting the new user page" do
+             before { visit signup_path }         
+             it { should check_title('') }
+             it{ should_not have_selector('h1',text:"Sign up")} 
+             it{ should_not have_button("Create my account")} 
+          end
+
+        end
+
+        describe "followed by signout" do
+          before { click_link "Sign out" }
+          it { should have_link('Sign in') }
+        end
+      end
+
+      before { sign_in user, no_capybara: true }
+
+      describe "submitting to the create action" do
+        before { post users_path(new_user), no_capybara: true  }
+        specify { expect(response).to redirect_to(root_path) }
+      end
+
     end
   end
 
@@ -60,8 +91,10 @@ describe "Authentication" do
         describe "after sign in" do
 
           it "should render the desired protected page" do
+            # save_and_open_page
             expect(page).to have_title('Edit user')
           end
+
         end
       end
 
