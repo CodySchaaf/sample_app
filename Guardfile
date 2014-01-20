@@ -14,6 +14,7 @@ guard 'spork', :cucumber_env => { 'RAILS_ENV' => 'test' },
 end
 
 guard 'rspec', all_after_pass: false, cli: '--drb' do
+  watch('config/routes.rb')
    # Custom Rails Tutorial specs
   watch(%r{^app/controllers/(.+)_(controller)\.rb$}) do |m|
     ["spec/routing/#{m[1]}_routing_spec.rb",
