@@ -66,19 +66,36 @@ describe "User pages" do
 
 
   describe "profile page" do
+    let(:signed_out_user) { FactoryGirl.create(:user) }
+    let!(:m_signed_out) { FactoryGirl.create(:micropost, user: signed_out_user, content: "Signed Out!") }
     let(:user) { FactoryGirl.create(:user) }
     let!(:m1) { FactoryGirl.create(:micropost, user: user, content: "Foo") }
     let!(:m2) { FactoryGirl.create(:micropost, user: user, content: "Bar") }
 
-    before { visit user_path(user) }
+    before do 
+      sign_in user
+      visit user_path(user) 
+    end
+    
+    describe "after signing in" do
+      it { should have_content(user.name) }
+      it { should have_title(user.name) }
 
-    it { should have_content(user.name) }
-    it { should have_title(user.name) }
+      describe "microposts" do
+        it { should have_content(m1.content) }
+        it { should have_content(m2.content) }
+        it { should have_content(user.microposts.count) }
 
-    describe "microposts" do
-      it { should have_content(m1.content) }
-      it { should have_content(m2.content) }
-      it { should have_content(user.microposts.count) }
+        it { should have_link("delete", href: "/microposts/#{m1.id}") } 
+        it { should have_link("delete", href: "/microposts/#{m2.id}") } 
+      end
+
+      describe "microposts for the signed out user" do
+        before { visit user_path(signed_out_user) }
+
+        it { should have_selector("li", text: 'Signed Out!') }
+        it { should_not have_link("delete", href: "/microposts/#{m_signed_out.id}") }
+      end
     end
   end
 
@@ -176,6 +193,6 @@ describe "User pages" do
           patch user_path(user), params
         end
         specify { expect(user.reload).not_to be_admin }
-      end
-    end
+    end 
   end
+end
