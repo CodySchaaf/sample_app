@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :signed_in_user,    only: [:edit, :update, :index, :destroy]
+  before_action :signed_in_user,    only: [:edit, :update, :index, :destroy, :following, :followers]
   before_action :correct_user,      only: [:edit, :update]
   before_action :admin_user,        only: :destroy
   before_action :currently_signed_in?, only: [:new, :create]
@@ -40,12 +40,6 @@ class UsersController < ApplicationController
     end
   end
 
-  # def destroy
-  #   User.find(params[:id]).destroy
-  #   flash[:success] = "User deleted!"
-  #   redirect_to users_url
-  # end
-
   def destroy
     user_to_destroy = User.find(params[:id])
     unless user_to_destroy.admin? && current_user?(user_to_destroy)
@@ -56,6 +50,20 @@ class UsersController < ApplicationController
       flash[:error] = "Don't delete yourself Mr. Admin"
       redirect_to root_url
     end
+  end
+
+  def following
+    @title = 'Following'
+    @user = User.find(params[:id])
+    @users = @user.followed_users.paginate(page: params[:page])
+    render 'show_follow'
+  end
+  
+  def followers
+    @title = 'Followers'
+    @user = User.find(params[:id])
+    @users = @user.followers.paginate(page: params[:page])
+    render 'show_follow'
   end
 
   private
